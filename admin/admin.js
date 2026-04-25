@@ -738,9 +738,15 @@
   function loadGitHubConfig() {
     try {
       const raw = localStorage.getItem(GH_CONFIG_KEY);
-      return raw ? JSON.parse(raw) : { owner: '', repo: '', token: '' };
+      const cfg = raw ? JSON.parse(raw) : {};
+      return {
+        owner: cfg.owner || '',
+        repo: cfg.repo || '',
+        branch: cfg.branch || 'main',
+        token: cfg.token || ''
+      };
     } catch (_) {
-      return { owner: '', repo: '', token: '' };
+      return { owner: '', repo: '', branch: 'main', token: '' };
     }
   }
 
@@ -751,12 +757,14 @@
   function bindGitHub() {
     const form = document.getElementById('github-config-form');
     const syncBtn = document.getElementById('github-sync-btn');
+    const testBtn = document.getElementById('github-test-btn');
     if (!form || !syncBtn) return;
 
     // Preencher campos com configuração guardada
     const cfg = loadGitHubConfig();
     setValue('github-owner', cfg.owner);
     setValue('github-repo', cfg.repo);
+    setValue('github-branch', cfg.branch || 'main');
     setValue('github-token', cfg.token);
 
     // Guardar configuração
@@ -765,11 +773,19 @@
       const config = {
         owner: valueOf('github-owner'),
         repo: valueOf('github-repo'),
+        branch: valueOf('github-branch') || 'main',
         token: valueOf('github-token')
       };
       saveGitHubConfig(config);
-      setGitHubStatus('Configuração guardada com sucesso.', 'success');
+      setGitHubStatus('✅ Configuração guardada com sucesso.', 'success');
     });
+
+    // Testar ligação ao repositório
+    if (testBtn) {
+      testBtn.addEventListener('click', () => {
+        testGitHubConnection();
+      });
+    }
 
     // Publicar no GitHub
     syncBtn.addEventListener('click', () => {
@@ -777,11 +793,71 @@
     });
   }
 
+  async function testGitHubConnection() {
+    const cfg = loadGitHubConfig();
+
+    if (!cfg.owner || !cfg.repo || !cfg.token) {
+      setGitHubStatus('⚠️ Preencha e guarde o Owner, Repositório, Branch e Token antes de testar.', 'error');
+      return;
+    }
+
+    setGitHubStatus('⏳ A verificar ligação ao GitHub...', 'neutral');
+
+    const headers = {
+      'Authorization': `Bearer ${cfg.token}`,
+      'Accept': 'application/vnd.github+json'
+    };
+
+    try {
+      // Verificar se o repositório existe
+      const repoResp = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}`, { headers });
+      if (repoResp.status === 401) {
+        setGitHubStatus('❌ Token inválido ou expirado. Gere um novo token com scope "repo".', 'error');
+        return;
+      }
+      if (repoResp.status === 403) {
+        setGitHubStatus('❌ Sem permissão. Certifique-se que o token tem o scope "repo".', 'error');
+        return;
+      }
+      if (repoResp.status === 404) {
+        setGitHubStatus(`❌ Repositório não encontrado: "${cfg.owner}/${cfg.repo}". Verifique o owner e o nome do repositório.`, 'error');
+        return;
+      }
+      if (!repoResp.ok) {
+        setGitHubStatus(`❌ Erro ao aceder ao repositório: ${repoResp.status}`, 'error');
+        return;
+      }
+
+      const repoData = await repoResp.json();
+      const defaultBranch = repoData.default_branch || 'main';
+
+      // Verificar se a branch configurada existe
+      const branchResp = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/branches/${cfg.branch}`, { headers });
+      if (branchResp.status === 404) {
+        setGitHubStatus(
+          `⚠️ Branch "${cfg.branch}" não encontrada. A branch principal deste repositório é "${defaultBranch}". Atualize o campo Branch e guarde.`,
+          'error'
+        );
+        // Auto-sugerir branch correta no campo
+        setValue('github-branch', defaultBranch);
+        return;
+      }
+
+      setGitHubStatus(
+        `✅ Ligação bem-sucedida! Repositório: ${repoData.full_name} | Branch: ${cfg.branch} | Visibilidade: ${repoData.private ? 'Privado' : 'Público'}`,
+        'success'
+      );
+    } catch (err) {
+      console.error('[testGitHubConnection]', err);
+      setGitHubStatus(`❌ Erro de rede: ${err.message}`, 'error');
+    }
+  }
+
   async function syncToGitHub() {
     const cfg = loadGitHubConfig();
 
     if (!cfg.owner || !cfg.repo || !cfg.token) {
-      setGitHubStatus('⚠️ Preencha e guarde o Owner, Repositório e Token antes de publicar.', 'error');
+      setGitHubStatus('⚠️ Preencha e guarde o Owner, Repositório, Branch e Token antes de publicar.', 'error');
       return;
     }
 
@@ -863,12 +939,20 @@ initDatabase();
 
     try {
       // 1. Obter SHA atual do ficheiro (necessário para o PUT)
+      const branch = cfg.branch || 'main';
       let sha = null;
-      const getResp = await fetch(apiBase, { headers });
+      const getResp = await fetch(`${apiBase}?ref=${encodeURIComponent(branch)}`, { headers });
       if (getResp.ok) {
         const fileInfo = await getResp.json();
         sha = fileInfo.sha || null;
-      } else if (getResp.status !== 404) {
+      } else if (getResp.status === 401) {
+        throw new Error('Token inválido ou expirado. Gere um novo token com scope "repo".');
+      } else if (getResp.status === 403) {
+        throw new Error('Sem permissão. Certifique-se que o token tem o scope "repo".');
+      } else if (getResp.status === 404) {
+        // Ficheiro não existe ainda — será criado pelo PUT (sha fica null)
+        sha = null;
+      } else {
         const errText = await getResp.text();
         throw new Error(`Erro ao obter SHA: ${getResp.status} — ${errText}`);
       }
@@ -880,7 +964,7 @@ initDatabase();
       const body = {
         message: `chore: sync data.js via admin panel [${new Date(lastUpdated).toISOString()}]`,
         content: encoded,
-        branch: 'main'
+        branch: cfg.branch || 'main'
       };
       if (sha) body.sha = sha;
 
@@ -892,7 +976,17 @@ initDatabase();
 
       if (!putResp.ok) {
         const errJson = await putResp.json().catch(() => ({}));
-        throw new Error(`GitHub API: ${putResp.status} — ${errJson.message || 'Erro desconhecido'}`);
+        let hint = '';
+        if (putResp.status === 404) {
+          hint = ` — Verifique se o owner "${cfg.owner}", o repositório "${cfg.repo}" e a branch "${cfg.branch || 'main'}" estão corretos. Use o botão "Testar Ligação" para diagnosticar.`;
+        } else if (putResp.status === 401) {
+          hint = ' — Token inválido ou expirado.';
+        } else if (putResp.status === 403) {
+          hint = ' — Sem permissão. O token precisa do scope "repo".';
+        } else if (putResp.status === 422) {
+          hint = ' — Conflito de SHA. Tente novamente.';
+        }
+        throw new Error(`GitHub API: ${putResp.status} — ${errJson.message || 'Erro desconhecido'}${hint}`);
       }
 
       // 4. Atualizar o timestamp local para refletir a versão publicada
