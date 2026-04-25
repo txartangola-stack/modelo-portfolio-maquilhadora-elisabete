@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Makeup Artist</title>
+  <meta name="description" content="Portfolio online elegante para profissional de maquilhagem" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <script>
+    tailwind = window.tailwind || {};
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blush: '#f5d7dd',
+            nude: '#f4ece4',
+            ink: '#1f1a1c',
+            gold: '#c6a66b'
+          },
+          fontFamily: {
+            display: ['Cormorant Garamond', 'serif'],
+            sans: ['Manrope', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body class="bg-[#f8f5f2] text-ink font-sans">
+  <div class="gradient-bg" aria-hidden="true"></div>
+
+  <header class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-white/70 border-b border-white/40">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+      <a href="#hero" id="brand-name" class="font-display text-2xl sm:text-3xl tracking-wide">Aurora Beauty Studio</a>
+      <button id="menu-toggle" class="lg:hidden rounded-full border border-black/20 px-3 py-1 text-sm">Menu</button>
+      <nav id="nav-links" class="hidden lg:flex items-center gap-5 text-sm font-medium">
+        <a href="#sobre" class="hover:text-gold transition-colors">Sobre</a>
+        <a href="#servicos" class="hover:text-gold transition-colors">Serviços</a>
+        <a href="#portfolio" class="hover:text-gold transition-colors">Portfólio</a>
+        <a href="#formacoes" class="hover:text-gold transition-colors">Formações</a>
+        <a href="#experiencia" class="hover:text-gold transition-colors">Experiência</a>
+        <a href="#contacto" class="hover:text-gold transition-colors">Contacto</a>
+        <a href="admin/admin.html" class="btn-mini">Admin</a>
+      </nav>
+    </div>
+    <nav id="mobile-links" class="hidden lg:hidden border-t border-black/10 bg-white/90 px-4 py-3">
+      <div class="flex flex-col gap-3 text-sm">
+        <a href="#sobre">Sobre</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#portfolio">Portfólio</a>
+        <a href="#formacoes">Formações</a>
+        <a href="#experiencia">Experiência</a>
+        <a href="#contacto">Contacto</a>
+        <a href="admin/admin.html">Painel Admin</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="pt-20 sm:pt-24">
+    <section id="hero" class="relative min-h-[88vh] flex items-center overflow-hidden reveal">
+      <div id="hero-bg" class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-white">
+        <p id="hero-specialty" class="uppercase tracking-[0.22em] text-xs sm:text-sm mb-4 text-white/85">Bridal Makeup |
+          Glam | Editorial</p>
+        <h1 id="hero-name" class="font-display text-5xl sm:text-6xl lg:text-7xl leading-none mb-4">Aurora Beauty Studio
+        </h1>
+        <p id="hero-tagline" class="max-w-xl text-lg sm:text-xl text-white/90 mb-8">Realçando a sua beleza única com
+          sofisticação e arte.</p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#portfolio" class="btn-primary">Ver Portfólio</a>
+          <a href="#contacto" class="btn-outline">Agendar Serviço</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="sobre" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="section-shell grid lg:grid-cols-[320px_1fr] gap-8 items-center">
+        <div class="relative">
+          <img id="about-image" src="" alt="Foto da profissional"
+            class="w-full h-[360px] object-cover rounded-3xl shadow-xl" loading="lazy" />
+          <span class="glow-dot"></span>
+        </div>
+        <div>
+          <p class="text-xs uppercase tracking-[0.3em] text-gold mb-3">Sobre</p>
+          <h2 class="font-display text-4xl mb-4">Transformar beleza em assinatura visual</h2>
+          <p id="about-bio" class="text-base leading-relaxed text-black/75 mb-4"></p>
+          <div class="grid sm:grid-cols-3 gap-4 text-sm">
+            <div class="info-chip">
+              <strong class="block">Estilo</strong>
+              <span id="about-style"></span>
+            </div>
+            <div class="info-chip">
+              <strong class="block">Experiência</strong>
+              <span><span id="about-years"></span> anos</span>
+            </div>
+            <div class="info-chip">
+              <strong class="block">Localização</strong>
+              <span id="about-location"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="servicos" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="flex items-end justify-between gap-4 mb-8">
+        <div>
+          <p class="section-kicker">Serviços</p>
+          <h2 class="section-title">Experiências de maquilhagem personalizadas</h2>
+        </div>
+      </div>
+      <div id="services-grid" class="grid sm:grid-cols-2 xl:grid-cols-4 gap-5"></div>
+    </section>
+
+    <section id="portfolio" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="mb-8">
+        <p class="section-kicker">Portfólio</p>
+        <h2 class="section-title">Resultados reais com estética editorial</h2>
+        <p class="text-black/70">Filtre por categoria e clique para ampliar.</p>
+      </div>
+      <div id="portfolio-filters" class="flex flex-wrap gap-2 mb-6"></div>
+      <div id="portfolio-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
+
+    <section id="formacoes" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="mb-8">
+        <p class="section-kicker">Formações</p>
+        <h2 class="section-title">Capacitação contínua e certificada</h2>
+      </div>
+      <div id="formations-list" class="grid md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <section id="curriculo" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 reveal">
+      <div class="section-shell flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+        <div>
+          <p class="section-kicker">Currículo</p>
+          <h2 class="section-title">Perfil profissional completo</h2>
+          <p id="cv-status" class="text-black/65 text-sm">Currículo pronto para download.</p>
+        </div>
+        <div class="flex gap-3">
+          <a id="cv-download" class="btn-primary" href="#">Baixar CV</a>
+          <a id="cv-view" class="btn-outline" href="#" target="_blank" rel="noopener">Visualizar</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="experiencia" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="mb-8">
+        <p class="section-kicker">Experiência Profissional</p>
+        <h2 class="section-title">Linha do tempo de projetos e colaborações</h2>
+      </div>
+      <div id="experience-timeline" class="timeline"></div>
+    </section>
+
+    <section id="competencias" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="mb-8">
+        <p class="section-kicker">Competências</p>
+        <h2 class="section-title">Técnica e experiência com atendimento premium</h2>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-8">
+        <div>
+          <h3 class="font-display text-2xl mb-4">Técnicas</h3>
+          <div id="technical-skills" class="space-y-4"></div>
+        </div>
+        <div>
+          <h3 class="font-display text-2xl mb-4">Soft Skills</h3>
+          <div id="soft-skills" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testemunhos" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="mb-8">
+        <p class="section-kicker">Testemunhos</p>
+        <h2 class="section-title">Palavras de quem viveu a experiência</h2>
+      </div>
+      <div id="testimonials-grid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+    </section>
+
+    <section id="instagram" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="mb-8 flex items-end justify-between">
+        <div>
+          <p class="section-kicker">Instagram / Redes</p>
+          <h2 class="section-title">Feed visual com estética de editorial</h2>
+        </div>
+        <a id="instagram-link" href="#" target="_blank" rel="noopener"
+          class="text-sm font-semibold text-gold">@makeupartist</a>
+      </div>
+      <div id="instagram-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
+    </section>
+
+    <section id="contacto" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 reveal">
+      <div class="section-shell grid lg:grid-cols-[1fr_360px] gap-6">
+        <div>
+          <p class="section-kicker">Contacto</p>
+          <h2 class="section-title">Vamos criar o seu look perfeito?</h2>
+          <form id="contact-form" class="mt-5 grid gap-4 max-w-xl">
+            <input type="text" name="nome" required placeholder="Nome" class="input-field" />
+            <input type="email" name="email" required placeholder="Email" class="input-field" />
+            <textarea name="mensagem" rows="5" required placeholder="Mensagem" class="input-field"></textarea>
+            <button type="submit" class="btn-primary w-fit">Enviar Mensagem</button>
+          </form>
+          <p id="form-status" class="text-sm mt-3 text-black/70"></p>
+        </div>
+        <div class="space-y-3">
+          <a id="contact-whatsapp" href="#" target="_blank" rel="noopener" class="quick-link">WhatsApp</a>
+          <a id="contact-email" href="#" class="quick-link">Email</a>
+          <a id="contact-instagram" href="#" target="_blank" rel="noopener" class="quick-link">Instagram</a>
+          <a id="contact-facebook" href="#" target="_blank" rel="noopener" class="quick-link">Facebook</a>
+          <a id="contact-tiktok" href="#" target="_blank" rel="noopener" class="quick-link">TikTok</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-black/10">
+    <div
+      class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-black/70">
+      <p id="footer-copy"></p>
+      <div class="flex gap-4">
+        <a href="#hero">Início</a>
+        <a href="#portfolio">Portfólio</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+    </div>
+  </footer>
+
+  <button id="backToTop" class="hidden" aria-label="Voltar ao topo">↑</button>
+
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <button id="lightbox-close" class="lightbox-close" aria-label="Fechar">×</button>
+    <img id="lightbox-image" src="" alt="Imagem ampliada" class="lightbox-image" />
+    <div class="lightbox-caption">
+      <h4 id="lightbox-title"></h4>
+      <p id="lightbox-description"></p>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

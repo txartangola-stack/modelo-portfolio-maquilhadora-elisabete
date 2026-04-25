@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin | Makeup Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind = window.tailwind || {};
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            blush: '#f5d7dd',
+            nude: '#f4ece4',
+            ink: '#1f1a1c',
+            gold: '#c6a66b'
+          },
+          fontFamily: {
+            display: ['Cormorant Garamond', 'serif'],
+            sans: ['Manrope', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body class="font-sans text-ink bg-[#f8f5f2]">
+  <div class="admin-bg" aria-hidden="true"></div>
+
+  <main class="relative min-h-screen px-4 sm:px-6 lg:px-8 py-8">
+    <section id="login-panel" class="max-w-md mx-auto admin-card">
+      <h1 class="font-display text-4xl mb-2">Painel Administrativo</h1>
+      <p class="text-black/70 text-sm mb-5">Entre para gerir o conteúdo da landing page.</p>
+      <form id="login-form" class="grid gap-4">
+        <input id="login-username" type="text" class="admin-input" placeholder="Utilizador" required />
+        <input id="login-password" type="password" class="admin-input" placeholder="Palavra-passe" required />
+        <button type="submit" class="admin-btn">Entrar</button>
+      </form>
+      <p class="text-xs text-black/55 mt-3">Credenciais padrão: <strong>admin</strong> / <strong>makeup123</strong></p>
+      <p id="login-status" class="text-sm mt-2"></p>
+    </section>
+
+    <section id="dashboard" class="hidden max-w-7xl mx-auto space-y-6">
+      <header class="admin-card flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <div>
+          <h1 class="font-display text-4xl">Gestão de Conteúdo</h1>
+          <p class="text-black/70 text-sm">Todas as alterações são guardadas em localStorage e atualizam o frontend.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a href="../index.html" target="_blank" rel="noopener" class="admin-btn-secondary">Abrir Landing</a>
+          <button id="reset-data" class="admin-btn-secondary">Repor Padrão</button>
+          <button id="logout" class="admin-btn-danger">Sair</button>
+        </div>
+      </header>
+
+      <p id="admin-status" class="text-sm"></p>
+
+      <section class="admin-card space-y-4" id="admin-profile">
+        <h2 class="admin-title">Informações Pessoais</h2>
+        <form id="profile-form" class="grid md:grid-cols-2 gap-4">
+          <input id="profile-name" class="admin-input" placeholder="Nome profissional" required />
+          <input id="profile-specialty" class="admin-input" placeholder="Especialidade" required />
+          <input id="profile-tagline" class="admin-input md:col-span-2" placeholder="Frase de impacto" required />
+          <textarea id="profile-bio" class="admin-input md:col-span-2" placeholder="Biografia" rows="4" required></textarea>
+          <input id="profile-style" class="admin-input" placeholder="Estilo de maquilhagem" />
+          <input id="profile-years" class="admin-input" type="number" min="0" placeholder="Anos de experiência" />
+          <input id="profile-location" class="admin-input" placeholder="Localização" />
+          <input id="profile-email" type="email" class="admin-input" placeholder="Email" />
+          <input id="profile-whatsapp" class="admin-input" placeholder="WhatsApp (244...)" />
+          <input id="profile-instagram" class="admin-input" placeholder="Link Instagram" />
+          <input id="profile-facebook" class="admin-input" placeholder="Link Facebook" />
+          <input id="profile-tiktok" class="admin-input" placeholder="Link TikTok" />
+          <input id="profile-hero-image" class="admin-input" placeholder="URL imagem hero" />
+          <input id="profile-hero-file" type="file" accept="image/*" class="admin-input file:mr-2 file:text-xs" />
+          <input id="profile-image" class="admin-input" placeholder="URL foto de perfil" />
+          <input id="profile-image-file" type="file" accept="image/*" class="admin-input file:mr-2 file:text-xs" />
+          <button type="submit" class="admin-btn md:col-span-2">Guardar Informações</button>
+        </form>
+      </section>
+
+      <section class="admin-card space-y-4" id="admin-services">
+        <h2 class="admin-title">Serviços (CRUD)</h2>
+        <form id="service-form" class="grid md:grid-cols-4 gap-3">
+          <input id="service-id" type="hidden" />
+          <input id="service-title" class="admin-input" placeholder="Título" required />
+          <input id="service-price" class="admin-input" placeholder="Preço" />
+          <input id="service-description" class="admin-input md:col-span-2" placeholder="Descrição" required />
+          <button class="admin-btn" type="submit">Guardar Serviço</button>
+          <button class="admin-btn-secondary" type="button" id="service-cancel">Cancelar Edição</button>
+        </form>
+        <div class="overflow-x-auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Título</th><th>Preço</th><th>Descrição</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="services-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-card space-y-4" id="admin-portfolio">
+        <h2 class="admin-title">Portfólio (CRUD + Upload)</h2>
+        <form id="portfolio-form" class="grid md:grid-cols-4 gap-3">
+          <input id="portfolio-id" type="hidden" />
+          <input id="portfolio-title" class="admin-input" placeholder="Título" required />
+          <input id="portfolio-category" class="admin-input" placeholder="Categoria (Bridal, Glam...)" required />
+          <input id="portfolio-description" class="admin-input md:col-span-2" placeholder="Descrição" required />
+          <input id="portfolio-image" class="admin-input md:col-span-2" placeholder="URL da imagem" />
+          <input id="portfolio-image-file" type="file" accept="image/*" class="admin-input md:col-span-2 file:mr-2 file:text-xs" />
+          <button class="admin-btn" type="submit">Guardar Item</button>
+          <button class="admin-btn-secondary" type="button" id="portfolio-cancel">Cancelar Edição</button>
+        </form>
+        <div class="overflow-x-auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Título</th><th>Categoria</th><th>Imagem</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="portfolio-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-card space-y-4" id="admin-formations">
+        <h2 class="admin-title">Formações (CRUD + Certificados)</h2>
+        <form id="formation-form" class="grid md:grid-cols-4 gap-3">
+          <input id="formation-id" type="hidden" />
+          <input id="formation-course" class="admin-input md:col-span-2" placeholder="Curso" required />
+          <input id="formation-institution" class="admin-input" placeholder="Instituição" required />
+          <input id="formation-year" class="admin-input" placeholder="Ano" required />
+          <input id="formation-certificate-url" class="admin-input md:col-span-2" placeholder="URL certificado PDF" />
+          <input id="formation-certificate-file" type="file" accept="application/pdf" class="admin-input md:col-span-2 file:mr-2 file:text-xs" />
+          <button class="admin-btn" type="submit">Guardar Formação</button>
+          <button class="admin-btn-secondary" type="button" id="formation-cancel">Cancelar Edição</button>
+        </form>
+        <div class="overflow-x-auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Curso</th><th>Instituição</th><th>Ano</th><th>Certificado</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="formations-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-card space-y-4" id="admin-cv">
+        <h2 class="admin-title">Currículo (Upload PDF)</h2>
+        <form id="cv-form" class="grid md:grid-cols-3 gap-3">
+          <input id="cv-url" class="admin-input md:col-span-2" placeholder="URL CV PDF (opcional)" />
+          <input id="cv-file" type="file" accept="application/pdf" class="admin-input file:mr-2 file:text-xs" />
+          <button class="admin-btn" type="submit">Guardar CV</button>
+        </form>
+        <p id="cv-admin-status" class="text-sm text-black/70"></p>
+      </section>
+
+      <section class="admin-card space-y-4" id="admin-experience">
+        <h2 class="admin-title">Experiência Profissional (CRUD)</h2>
+        <form id="experience-form" class="grid md:grid-cols-4 gap-3">
+          <input id="experience-id" type="hidden" />
+          <input id="experience-company" class="admin-input" placeholder="Empresa/Cliente" required />
+          <input id="experience-role" class="admin-input" placeholder="Tipo de trabalho" required />
+          <input id="experience-period" class="admin-input" placeholder="Período" required />
+          <input id="experience-logo" class="admin-input" placeholder="URL logotipo (opcional)" />
+          <input id="experience-logo-file" type="file" accept="image/*" class="admin-input file:mr-2 file:text-xs" />
+          <textarea id="experience-description" class="admin-input md:col-span-2" placeholder="Descrição" rows="3" required></textarea>
+          <button class="admin-btn" type="submit">Guardar Experiência</button>
+          <button class="admin-btn-secondary" type="button" id="experience-cancel">Cancelar Edição</button>
+        </form>
+        <div class="overflow-x-auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Empresa</th><th>Função</th><th>Período</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="experience-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="admin-card space-y-6" id="admin-skills">
+        <h2 class="admin-title">Competências (CRUD)</h2>
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div>
+            <h3 class="font-display text-2xl mb-3">Técnicas</h3>
+            <form id="skill-tech-form" class="grid grid-cols-2 gap-3 mb-3">
+              <input id="skill-tech-id" type="hidden" />
+              <input id="skill-tech-name" class="admin-input" placeholder="Competência" required />
+              <input id="skill-tech-level" type="number" min="0" max="100" class="admin-input" placeholder="Nível %" required />
+              <button class="admin-btn" type="submit">Guardar</button>
+              <button class="admin-btn-secondary" type="button" id="skill-tech-cancel">Cancelar</button>
+            </form>
+            <div class="overflow-x-auto">
+              <table class="admin-table">
+                <thead><tr><th>Nome</th><th>Nível</th><th>Ações</th></tr></thead>
+                <tbody id="skills-tech-list"></tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <h3 class="font-display text-2xl mb-3">Soft Skills</h3>
+            <form id="skill-soft-form" class="grid grid-cols-2 gap-3 mb-3">
+              <input id="skill-soft-id" type="hidden" />
+              <input id="skill-soft-name" class="admin-input" placeholder="Competência" required />
+              <input id="skill-soft-level" type="number" min="0" max="100" class="admin-input" placeholder="Nível %" required />
+              <button class="admin-btn" type="submit">Guardar</button>
+              <button class="admin-btn-secondary" type="button" id="skill-soft-cancel">Cancelar</button>
+            </form>
+            <div class="overflow-x-auto">
+              <table class="admin-table">
+                <thead><tr><th>Nome</th><th>Nível</th><th>Ações</th></tr></thead>
+                <tbody id="skills-soft-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-card space-y-4" id="admin-testimonials">
+        <h2 class="admin-title">Testemunhos (CRUD)</h2>
+        <form id="testimonial-form" class="grid md:grid-cols-4 gap-3">
+          <input id="testimonial-id" type="hidden" />
+          <input id="testimonial-name" class="admin-input" placeholder="Nome" required />
+          <input id="testimonial-role" class="admin-input" placeholder="Perfil (Noiva, Cliente...)" />
+          <input id="testimonial-rating" type="number" min="1" max="5" class="admin-input" placeholder="Avaliação 1-5" required />
+          <input id="testimonial-avatar" class="admin-input" placeholder="URL avatar" />
+          <input id="testimonial-avatar-file" type="file" accept="image/*" class="admin-input file:mr-2 file:text-xs" />
+          <textarea id="testimonial-text" class="admin-input md:col-span-2" placeholder="Mensagem" rows="3" required></textarea>
+          <button class="admin-btn" type="submit">Guardar Testemunho</button>
+          <button class="admin-btn-secondary" type="button" id="testimonial-cancel">Cancelar Edição</button>
+        </form>
+        <div class="overflow-x-auto">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Nome</th><th>Avaliação</th><th>Mensagem</th><th>Ações</th></tr>
+            </thead>
+            <tbody id="testimonials-list"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================================================ -->
+      <!--  SECÇÃO: SINCRONIZAÇÃO GITHUB                   -->
+      <!-- ================================================ -->
+      <section class="admin-card space-y-4" id="admin-github-sync">
+        <h2 class="admin-title">Sincronização GitHub</h2>
+        <p class="text-sm text-black/65">
+          Configure o repositório e publique todos os dados diretamente no GitHub.
+          O token fica guardado apenas no seu browser (localStorage) e nunca é publicado.
+        </p>
+
+        <form id="github-config-form" class="grid md:grid-cols-2 gap-3">
+          <input id="github-owner" class="admin-input" placeholder="Owner do repositório (ex: maria-quiano)" />
+          <input id="github-repo" class="admin-input" placeholder="Nome do repositório (ex: portfolio-maquilhadora)" />
+          <input id="github-token" type="password" class="admin-input md:col-span-2"
+            placeholder="GitHub Personal Access Token (ghp_...)" autocomplete="off" />
+          <button type="submit" class="admin-btn">Guardar Configuração</button>
+          <button type="button" id="github-sync-btn" class="admin-btn" style="background:linear-gradient(135deg,#24613d,#2e7d49)">
+            🚀 Publicar no GitHub
+          </button>
+        </form>
+
+        <div id="github-sync-status" class="text-sm font-medium mt-1" style="min-height:1.4em"></div>
+
+        <details class="text-xs text-black/50 mt-2">
+          <summary class="cursor-pointer select-none">Como obter o Token?</summary>
+          <ol class="mt-2 ml-4 list-decimal space-y-1">
+            <li>Aceda a <strong>github.com → Settings → Developer settings → Personal access tokens → Tokens (classic)</strong>.</li>
+            <li>Clique em <strong>Generate new token</strong> e selecione o scope <code>repo</code>.</li>
+            <li>Copie o token gerado e cole no campo acima.</li>
+          </ol>
+        </details>
+      </section>
+    </section>
+  </main>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/storage.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
